@@ -1,0 +1,41 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - 8001:8080
+    depends_on:
+      - db
+
+  frontend:
+    image: node:26-alpine
+    working_dir: /app
+    environment:
+      - NODE_ENV=de
+    volumes:
+      - ./frontend:/app
+    expose:
+      - "5173"
+    ports:
+      - "8002:5173"
+    command: "npm run dev -- --host"
+    depends_on:
+      - backend
+
+  db:
+    image: mysql:9.7
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: knt
+      MYSQL_DATABASE: knt
+      MYSQL_USER: knt
+      MYSQL_PASSWORD: knt
+    ports:
+      - 8000:3306
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database-files:/var/lib/mysql-files/KnT
+
+volumes:
+  db_data:
